@@ -17,7 +17,7 @@ def prediction(Education_1, ApplicantIncome, CoapplicantIncome, Credit_History, 
     Education_1 = 0 if Education_1 == "Graduate" else 1
     Credit_History = 0 if Credit_History == "Unclear Debts" else 1
 
-    # Create input data in the expected order
+    # Prepare input data
     input_data = pd.DataFrame(
         [[Education_1, ApplicantIncome, CoapplicantIncome, Credit_History, Loan_Amount_Term]],
         columns=["Education_1", "ApplicantIncome", "CoapplicantIncome", "Credit_History", "Loan_Amount_Term"]
@@ -26,7 +26,7 @@ def prediction(Education_1, ApplicantIncome, CoapplicantIncome, Credit_History, 
     # Ensure column order matches the classifier’s expectations
     input_data = input_data[classifier.feature_names_in_]
 
-    # Model prediction (0 = Rejected, 1 = Approved)
+    # Make prediction
     prediction = classifier.predict(input_data)
     pred_label = 'Approved' if prediction[0] == 1 else 'Rejected'
     return pred_label, input_data
@@ -71,7 +71,7 @@ def main():
     """
     Streamlit app for loan prediction.
     """
-    # Front-end elements
+    # App header
     st.markdown(
         """
         <div style="background-color:Yellow;padding:13px">
@@ -88,7 +88,7 @@ def main():
     Credit_History = st.selectbox("Credit History", ("Unclear Debts", "Clear Debts"))
     Loan_Amount_Term = st.number_input("Loan Term (in months)", min_value=0.0, format="%.0f")
 
-    # Prediction
+    # Prediction button
     if st.button("Predict"):
         result, input_data = prediction(
             Education_1,
@@ -98,13 +98,13 @@ def main():
             Loan_Amount_Term
         )
 
-        # Show result in color
+        # Display result
         if result == "Approved":
             st.success(f'Your loan is {result}', icon="✅")
         else:
             st.error(f'Your loan is {result}', icon="❌")
 
-        # Explanation: Most Influential Feature and SHAP Bar Plot
+        # Explanation of the result
         st.header("Most Influential Feature and SHAP Explanation")
         explanation_text, bar_chart = explain_with_most_influential_feature(input_data, final_result=result)
         st.write(explanation_text)
@@ -112,4 +112,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
