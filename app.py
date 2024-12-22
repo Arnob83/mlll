@@ -5,12 +5,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Load the trained model
-with open('/content/drive/MyDrive/Project _Defense ***/final paper/code/final code/loan_Copy/XGBoost_model.pkl', 'rb') as pickle_in:
+with open('XGBoost_model.pkl', 'rb') as pickle_in:
     classifier = pickle.load(pickle_in)
-
 
 @st.cache_data
 def prediction(Education_1, ApplicantIncome, CoapplicantIncome, Credit_History, Loan_Amount_Term):
+    """
+    Predict loan approval based on input features.
+    """
     # Convert user input
     Education_1 = 0 if Education_1 == "Graduate" else 1
     Credit_History = 0 if Credit_History == "Unclear Debts" else 1
@@ -39,7 +41,7 @@ def explain_with_most_influential_feature(input_data, final_result):
     shap_values = explainer(input_data)
 
     # Extract SHAP values for the input data
-    shap_values_for_input = shap_values.values[0]  # SHAP values for the first row of input_data
+    shap_values_for_input = shap_values.values[0]
 
     # Prepare feature importance data
     feature_names = input_data.columns
@@ -66,6 +68,9 @@ def explain_with_most_influential_feature(input_data, final_result):
     return explanation_text, plt
 
 def main():
+    """
+    Streamlit app for loan prediction.
+    """
     # Front-end elements
     st.markdown(
         """
@@ -78,10 +83,10 @@ def main():
 
     # User inputs
     Education_1 = st.selectbox('Education', ("Under_Graduate", "Graduate"))
-    ApplicantIncome = st.number_input("Applicant's Monthly Income", min_value=0.0)
-    CoapplicantIncome = st.number_input("Co-applicant's Monthly Income", min_value=0.0)
+    ApplicantIncome = st.number_input("Applicant's Monthly Income", min_value=0.0, format="%.2f")
+    CoapplicantIncome = st.number_input("Co-applicant's Monthly Income", min_value=0.0, format="%.2f")
     Credit_History = st.selectbox("Credit History", ("Unclear Debts", "Clear Debts"))
-    Loan_Amount_Term = st.number_input("Loan Term (in months)", min_value=0.0)
+    Loan_Amount_Term = st.number_input("Loan Term (in months)", min_value=0.0, format="%.0f")
 
     # Prediction
     if st.button("Predict"):
